@@ -1,0 +1,6 @@
+name: ghostfolio
+# Override — swaps the ghostfolio service to use the locally-built GH-3 image.
+# Usage: podman compose -f docker/docker-compose.yml -f docker/docker-compose.local.yml up -d
+services:
+  ghostfolio:
+    image: localhost/ghostfolio-local:latest
