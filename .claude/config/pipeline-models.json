@@ -1,0 +1,29 @@
+{
+  "_comment": "Central model configuration for the SDLC pipeline. Update model IDs here when intentionally upgrading. 'default' is used as fallback for any phase not explicitly listed.",
+  "pricing_per_million_tokens": {
+    "_comment": "USD per 1M tokens.",
+    "sonnet": { "input": 3.00, "cache_write": 3.75, "cache_read": 0.30, "output": 15.00 },
+    "opus":   { "input": 5.00, "cache_write": 6.25, "cache_read": 0.50, "output": 25.00 },
+    "haiku":  { "input": 1.00, "cache_write": 1.25, "cache_read": 0.10, "output": 5.00 }
+  },
+  "default": { "model": "claude-sonnet-4-6" },
+  "phases": {
+    "requirements":   { "model": "claude-sonnet-4-6" },
+    "architecture":   { "model": "claude-sonnet-4-6" },
+    "design-review":  { "model": "claude-sonnet-4-6" },
+    "impl-planning":  { "model": "claude-sonnet-4-6" },
+    "implementation": { "model": "claude-sonnet-4-6" },
+    "simplify":       { "model": "claude-haiku-4-5-20251001" },
+    "review":         { "model": "claude-haiku-4-5-20251001" },
+    "verification":   { "model": "claude-sonnet-4-6" },
+    "risk":           { "model": "claude-sonnet-4-6" },
+    "pr":             { "model": "claude-haiku-4-5-20251001" }
+  },
+  "large_feature_overrides": {
+    "_comment": "Applied when ticket type is Large Feature.",
+    "requirements":  { "model": "claude-sonnet-4-6" },
+    "architecture":  { "model": "claude-sonnet-4-6" },
+    "design-review": { "model": "claude-sonnet-4-6" },
+    "impl-planning": { "model": "claude-sonnet-4-6" }
+  }
+}

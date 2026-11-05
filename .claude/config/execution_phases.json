@@ -1,0 +1,38 @@
+{
+  "_description": "Defines which SDLC pipeline phases execute for each ticket classification. Read by the ticket-classification skill to determine the execution plan. The classification result is always shown to the user for confirmation before the pipeline starts.",
+
+  "phase_sets": {
+
+    "Hotfix": {
+      "_description": "Critical production break. Speed is the priority. No design or planning phases — go straight to implementation with an abbreviated requirements pass.",
+      "phases": ["requirements", "implementation", "review", "pr"]
+    },
+
+    "Bug": {
+      "_description": "Non-critical defect with a known root cause. Includes simplify and verification to ensure the fix does not introduce regressions.",
+      "phases": ["requirements", "implementation", "simplify", "review", "verification", "pr"]
+    },
+
+    "Spike": {
+      "_description": "Time-boxed investigation to answer a specific technical question or reduce uncertainty. Produces a spike_report.md. No code is shipped.",
+      "phases": ["requirements", "spike"],
+      "outputs": ["docs/artifacts/<ticket>/spike_report.md"]
+    },
+
+    "Story": {
+      "_description": "A user-facing feature or behaviour change that is well-understood enough to skip architecture. Includes implementation planning but no formal design review.",
+      "phases": ["requirements", "impl-planning", "implementation", "simplify", "review", "pr"]
+    },
+
+    "Small Feature": {
+      "_description": "A contained feature that needs a design but is low enough risk to skip a formal design review and risk assessment.",
+      "phases": ["requirements", "architecture", "qa-test-generation", "impl-planning", "implementation", "simplify", "review", "verification", "pr"]
+    },
+
+    "Large Feature": {
+      "_description": "A significant feature with broad impact or architectural complexity. Runs all 10 pipeline phases.",
+      "phases": ["requirements", "architecture", "design-review", "qa-test-generation", "impl-planning", "implementation", "simplify", "review", "verification", "risk", "pr"]
+    }
+
+  }
+}

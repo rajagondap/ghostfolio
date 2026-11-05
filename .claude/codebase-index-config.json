@@ -1,0 +1,9 @@
+{
+  "excluded_dirs": [
+    "node_modules",
+    "dist",
+    "coverage",
+    ".nx",
+    "tmp"
+  ]
+}

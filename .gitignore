@@ -28,6 +28,15 @@ npm-debug.log
 /.angular/cache
 .claude/settings.local.json
 .claude/worktrees
+
+# SDLC pipeline runtime state (generated, not committed)
+.claude/active-ticket
+.claude/loc-state.json
+.claude/loc-state.lock
+.codebase-index/
+docs/artifacts/
+pipeline-config.json
+.env.template
 .cursor/rules/nx-rules.mdc
 .env
 .env.prod
