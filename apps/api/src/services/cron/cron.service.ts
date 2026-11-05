@@ -1,5 +1,6 @@
 import { UserService } from '@ghostfolio/api/app/user/user.service';
 import { ConfigurationService } from '@ghostfolio/api/services/configuration/configuration.service';
+import { EcbFxRateService } from '@ghostfolio/api/services/ecb-fx-rate/ecb-fx-rate.service';
 import { PropertyService } from '@ghostfolio/api/services/property/property.service';
 import { DataGatheringService } from '@ghostfolio/api/services/queues/data-gathering/data-gathering.service';
 import { StatisticsGatheringService } from '@ghostfolio/api/services/queues/statistics-gathering/statistics-gathering.service';
@@ -23,6 +24,7 @@ export class CronService {
   public constructor(
     private readonly configurationService: ConfigurationService,
     private readonly dataGatheringService: DataGatheringService,
+    private readonly ecbFxRateService: EcbFxRateService,
     private readonly propertyService: PropertyService,
     private readonly statisticsGatheringService: StatisticsGatheringService,
     private readonly twitterBotService: TwitterBotService,
@@ -55,6 +57,13 @@ export class CronService {
   public async runEveryDayAtMidnight() {
     if (this.configurationService.get('ENABLE_FEATURE_SUBSCRIPTION')) {
       this.userService.resetAnalytics();
+    }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_11PM)
+  public async runEcbFxRateGathering() {
+    if (await this.isDataGatheringEnabled()) {
+      await this.ecbFxRateService.gatherRates();
     }
   }
 
