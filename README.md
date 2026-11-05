@@ -43,6 +43,47 @@ Ghostfolio is for you if you are...
 - 🙅 saying no to spreadsheets
 - 😎 still reading this list
 
+## What Kind of Application is Ghostfolio?
+
+Ghostfolio is a **portfolio tracker**, not a trading or brokerage platform. Understanding this distinction is key to getting the most out of it.
+
+|                           | Trading App (e.g. Zerodha, Groww)    | Ghostfolio                               |
+| ------------------------- | ------------------------------------ | ---------------------------------------- |
+| **Purpose**               | Execute buy/sell orders              | Track and analyse your investments       |
+| **Holds money**           | Yes — demat + trading account        | No — zero money involved                 |
+| **Places orders**         | Yes — real-time market execution     | No — read-only tracker                   |
+| **Regulated**             | Yes (SEBI, SEC, etc.)                | No (not a broker)                        |
+| **Works with one broker** | Only their own platform              | All brokers simultaneously               |
+| **Data entry**            | Automatic (your trades through them) | Manual (you log transactions yourself)   |
+| **Privacy**               | Data on their cloud servers          | Fully self-hosted, your data stays local |
+
+**The key insight:** Trading apps show you what you own _through them_. Ghostfolio shows you everything you own _everywhere_ — Zerodha, Groww, Coinbase, your bank FD, your gold — all in one unified view.
+
+### How Ghostfolio Helps You Manage Wealth
+
+**1. One dashboard for everything**
+Most investors hold assets across multiple platforms — stocks on Zerodha, mutual funds on Groww, crypto on CoinDCX, fixed deposits at their bank. Ghostfolio consolidates all of this into a single portfolio view so you always know your true net wealth.
+
+**2. Performance you can actually trust**
+Ghostfolio calculates your real Return on Average Investment (ROAI) including dividends, fees, and currency effects — across any time period (today, month-to-date, year-to-date, all time). This is the number that matters, not just "current value vs. buy price."
+
+**3. Know what you actually own**
+The Allocations view breaks down your portfolio by asset class, sector, geography, and currency. You might think you're diversified but actually have 80% in US tech — Ghostfolio makes this visible immediately.
+
+**4. Automated risk warnings (X-Ray)**
+X-Ray scans your portfolio against a set of rules and flags real risks: too much concentration in one account, too little emergency fund, high fee ratio, over-exposure to a single region. It gives you a concrete to-do list to improve your portfolio health.
+
+**5. Retirement planning (FIRE calculator)**
+Enter your savings rate, expected growth rate, and target retirement date. Ghostfolio projects when you'll be financially independent and how much you can safely withdraw per month — based on your _actual_ current portfolio, not hypothetical numbers.
+
+**6. Your data, your privacy**
+Unlike cloud-based wealth apps, Ghostfolio runs entirely on your own machine. No third party can see your financial data, sell it, or lose it in a breach. You own the database and can export everything at any time.
+
+**7. Multi-currency, global portfolios**
+Whether you hold INR assets, USD stocks, EUR bonds, or GBP ETFs, Ghostfolio converts everything into your chosen base currency in real time and tracks currency impact on performance separately.
+
+---
+
 ## Features
 
 - ✅ Create, update and delete transactions

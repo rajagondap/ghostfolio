@@ -1,0 +1,60 @@
+name: ghostfolio_test
+# Builds from local Dockerfile — used by SDLC pipeline to test code changes
+# before merging. Runs on port 3334 so it doesn't conflict with the
+# production-image stack on port 3333.
+#
+# Usage:
+#   podman build -t ghostfolio-local .
+#   podman compose -f docker/docker-compose.test.yml up -d
+#   # run STLC tests against http://localhost:3334
+#   podman compose -f docker/docker-compose.test.yml down
+
+services:
+  ghostfolio-test:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: ghostfolio-local:latest
+    container_name: gf-test-app
+    restart: 'no'
+    init: true
+    stop_grace_period: 30s
+    env_file:
+      - ../.env.test
+    ports:
+      - 3334:3333
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:3333/api/v1/health']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  postgres-test:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+    container_name: gf-test-postgres
+    environment:
+      POSTGRES_DB: ghostfolio-test-db
+      POSTGRES_USER: ghostfolio-user
+      POSTGRES_PASSWORD: ghostfolio-pg-2024
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres-test:/var/lib/postgresql/data
+
+  redis-test:
+    extends:
+      file: docker-compose.yml
+      service: redis
+    container_name: gf-test-redis
+    ports:
+      - 6380:6379
+
+volumes:
+  postgres-test:

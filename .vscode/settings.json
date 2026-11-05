@@ -1,4 +1,7 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "airun.settings": {
+    "workspaceId": "8bbcb17c-5669-41fe-a8c8-f3dbb101ae21"
+  }
 }
