@@ -70,6 +70,17 @@ model AccountBalance {
   @@index([date])
 }
 
+model ExchangeRate {
+  date         DateTime @db.Date
+  fromCurrency String
+  id           String   @id @default(cuid())
+  rate         Float
+  toCurrency   String
+
+  @@unique([date, fromCurrency, toCurrency])
+  @@index([date, fromCurrency, toCurrency])
+}
+
 model Analytics {
   activityCount                       Int            @default(0)
   country                             String?

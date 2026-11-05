@@ -2,6 +2,8 @@ import { UserModule } from '@ghostfolio/api/app/user/user.module';
 import { UserService } from '@ghostfolio/api/app/user/user.service';
 import { ConfigurationModule } from '@ghostfolio/api/services/configuration/configuration.module';
 import { ConfigurationService } from '@ghostfolio/api/services/configuration/configuration.service';
+import { EcbFxRateModule } from '@ghostfolio/api/services/ecb-fx-rate/ecb-fx-rate.module';
+import { EcbFxRateService } from '@ghostfolio/api/services/ecb-fx-rate/ecb-fx-rate.service';
 import { PropertyModule } from '@ghostfolio/api/services/property/property.module';
 import { PropertyService } from '@ghostfolio/api/services/property/property.service';
 import { DataGatheringQueueModule } from '@ghostfolio/api/services/queues/data-gathering/data-gathering.module';
@@ -19,6 +21,7 @@ import { CronService } from './cron.service';
   imports: [
     ConfigurationModule,
     DataGatheringQueueModule,
+    EcbFxRateModule,
     PropertyModule,
     StatisticsGatheringQueueModule,
     TwitterBotModule,
@@ -29,6 +32,7 @@ import { CronService } from './cron.service';
       inject: [
         ConfigurationService,
         DataGatheringService,
+        EcbFxRateService,
         PropertyService,
         StatisticsGatheringService,
         TwitterBotService,
@@ -38,6 +42,7 @@ import { CronService } from './cron.service';
       useFactory: (
         configurationService: ConfigurationService,
         dataGatheringService: DataGatheringService,
+        ecbFxRateService: EcbFxRateService,
         propertyService: PropertyService,
         statisticsGatheringService: StatisticsGatheringService,
         twitterBotService: TwitterBotService,
@@ -52,6 +57,7 @@ import { CronService } from './cron.service';
         return new CronService(
           configurationService,
           dataGatheringService,
+          ecbFxRateService,
           propertyService,
           statisticsGatheringService,
           twitterBotService,

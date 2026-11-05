@@ -8,12 +8,14 @@ import { ConfigurationModule } from '@ghostfolio/api/services/configuration/conf
 import { ConfigurationService } from '@ghostfolio/api/services/configuration/configuration.service';
 import { CronModule } from '@ghostfolio/api/services/cron/cron.module';
 import { DataProviderModule } from '@ghostfolio/api/services/data-provider/data-provider.module';
+import { EcbFxRateModule } from '@ghostfolio/api/services/ecb-fx-rate/ecb-fx-rate.module';
 import { ExchangeRateDataModule } from '@ghostfolio/api/services/exchange-rate-data/exchange-rate-data.module';
 import { I18nService } from '@ghostfolio/api/services/i18n/i18n.service';
 import { PrismaModule } from '@ghostfolio/api/services/prisma/prisma.module';
 import { PropertyModule } from '@ghostfolio/api/services/property/property.module';
 import { DataGatheringQueueModule } from '@ghostfolio/api/services/queues/data-gathering/data-gathering.module';
 import { PortfolioSnapshotQueueModule } from '@ghostfolio/api/services/queues/portfolio-snapshot/portfolio-snapshot.module';
+import { StartupMigrationModule } from '@ghostfolio/api/services/startup-migration/startup-migration.module';
 import {
   BULL_BOARD_ROUTE,
   THROTTLE_DEFAULT_LIMIT,
@@ -116,6 +118,7 @@ import { UserModule } from './user/user.module';
     ConfigModule.forRoot(),
     ConfigurationModule,
     CronModule,
+    EcbFxRateModule,
     DataGatheringQueueModule,
     DataProviderModule,
     EventEmitterModule.forRoot(),
@@ -153,6 +156,7 @@ import { UserModule } from './user/user.module';
       serveRoot: '/.well-known'
     }),
     SitemapModule,
+    StartupMigrationModule,
     SubscriptionModule,
     SymbolModule,
     TagsModule,

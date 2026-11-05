@@ -30,6 +30,7 @@ import { isNumber } from 'lodash-es';
 import ms from 'ms';
 
 import { ExchangeRatesByCurrency } from './interfaces/exchange-rate-data.interface';
+import { HistoricalRatePair } from './interfaces/historical-rate-pair.interface';
 
 @Injectable()
 export class ExchangeRateDataService {
@@ -286,18 +287,139 @@ export class ExchangeRateDataService {
     return aValue;
   }
 
+  public async getHistoricalRate(
+    fromCurrency: string,
+    toCurrency: string,
+    date: Date
+  ): Promise<number | undefined> {
+    if (fromCurrency === toCurrency) {
+      return 1;
+    }
+
+    // Try exact date first
+    const exactRate = await this.lookupRateOnDate(
+      fromCurrency,
+      toCurrency,
+      date
+    );
+
+    if (exactRate !== undefined) {
+      return exactRate;
+    }
+
+    // Nearest-date fallback (search up to 7 days back, no recursion)
+    for (let i = 1; i <= 7; i++) {
+      const fallbackDate = subDays(date, i);
+      const fallbackRate = await this.lookupRateOnDate(
+        fromCurrency,
+        toCurrency,
+        fallbackDate
+      );
+
+      if (fallbackRate !== undefined) {
+        this.logger.warn(
+          `No ${fromCurrency}/${toCurrency} rate on ${format(date, DATE_FORMAT)}, using ${format(fallbackDate, DATE_FORMAT)}`
+        );
+
+        return fallbackRate;
+      }
+    }
+
+    return undefined;
+  }
+
+  private async lookupRateOnDate(
+    fromCurrency: string,
+    toCurrency: string,
+    date: Date
+  ): Promise<number | undefined> {
+    // Direct lookup
+    const direct = await this.prismaService.exchangeRate.findFirst({
+      where: { date, fromCurrency, toCurrency }
+    });
+
+    if (direct) {
+      return direct.rate;
+    }
+
+    // Reverse pair
+    const reverse = await this.prismaService.exchangeRate.findFirst({
+      where: { date, fromCurrency: toCurrency, toCurrency: fromCurrency }
+    });
+
+    if (reverse) {
+      return 1 / reverse.rate;
+    }
+
+    // Triangulation via EUR (ECB stores all rates as EUR/XXX)
+    const [eurFrom, eurTo] = await Promise.all([
+      this.prismaService.exchangeRate.findFirst({
+        where: { date, fromCurrency: 'EUR', toCurrency: fromCurrency }
+      }),
+      this.prismaService.exchangeRate.findFirst({
+        where: { date, fromCurrency: 'EUR', toCurrency }
+      })
+    ]);
+
+    if (eurFrom && eurTo) {
+      return eurTo.rate / eurFrom.rate;
+    }
+
+    return undefined;
+  }
+
+  public async getManyHistoricalRates(
+    pairs: HistoricalRatePair[]
+  ): Promise<Map<string, number>> {
+    const result = new Map<string, number>();
+
+    if (pairs.length === 0) {
+      return result;
+    }
+
+    const records = await this.prismaService.exchangeRate.findMany({
+      where: {
+        OR: pairs.map((p) => ({
+          date: p.date,
+          fromCurrency: p.fromCurrency,
+          toCurrency: p.toCurrency
+        }))
+      }
+    });
+
+    for (const record of records) {
+      const key = `${record.fromCurrency}${record.toCurrency}:${format(record.date, DATE_FORMAT)}`;
+      result.set(key, record.rate);
+    }
+
+    return result;
+  }
+
   public async toCurrencyAtDate(
     aValue: number,
     aFromCurrency: string,
     aToCurrency: string,
     aDate: Date
-  ) {
+  ): Promise<number | undefined> {
     if (aValue === 0) {
       return 0;
     }
 
     if (isToday(aDate)) {
       return this.toCurrency(aValue, aFromCurrency, aToCurrency);
+    }
+
+    // Query ExchangeRate table first (historical ECB rates)
+    if (aFromCurrency !== aToCurrency) {
+      const historicalRate = await this.getHistoricalRate(
+        aFromCurrency,
+        aToCurrency,
+        aDate
+      );
+
+      if (historicalRate !== undefined) {
+        return aValue * historicalRate;
+      }
     }
 
     const derivedCurrencyFactor =

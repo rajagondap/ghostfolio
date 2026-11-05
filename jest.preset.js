@@ -2,5 +2,7 @@ const nxPreset = require('@nx/jest/preset').default;
 
 module.exports = {
   ...nxPreset,
-  transformIgnorePatterns: ['node_modules/(?!lodash-es/)']
+  transformIgnorePatterns: [
+    'node_modules/(?!(lodash-es|@openrouter|ai|@ai-sdk)/)'
+  ]
 };
