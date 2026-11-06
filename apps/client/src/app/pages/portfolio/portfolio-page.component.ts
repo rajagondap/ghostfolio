@@ -1,5 +1,6 @@
 import { UserService } from '@ghostfolio/client/services/user/user.service';
 import { User } from '@ghostfolio/common/interfaces';
+import { hasPermission, permissions } from '@ghostfolio/common/permissions';
 import { internalRoutes } from '@ghostfolio/common/routes/routes';
 import {
   GfPageTabsComponent,
@@ -17,6 +18,7 @@ import { addIcons } from 'ionicons';
 import {
   analyticsOutline,
   calculatorOutline,
+  gitCompareOutline,
   pieChartOutline,
   scanOutline,
   swapVerticalOutline
@@ -61,6 +63,19 @@ export class PortfolioPageComponent {
               routerLink:
                 internalRoutes.portfolio.subRoutes.allocations.routerLink
             },
+            ...(hasPermission(
+              state.user.permissions,
+              permissions.readRebalancingModels
+            ) && !state.user.settings.isRestrictedView
+              ? [
+                  {
+                    iconName: 'git-compare-outline',
+                    label: internalRoutes.portfolio.subRoutes.rebalancing.title,
+                    routerLink:
+                      internalRoutes.portfolio.subRoutes.rebalancing.routerLink
+                  }
+                ]
+              : []),
             {
               iconName: 'calculator-outline',
               label: internalRoutes.portfolio.subRoutes.fire.title,
@@ -81,6 +96,7 @@ export class PortfolioPageComponent {
     addIcons({
       analyticsOutline,
       calculatorOutline,
+      gitCompareOutline,
       pieChartOutline,
       scanOutline,
       swapVerticalOutline

@@ -66,6 +66,7 @@ import { InfoModule } from './info/info.module';
 import { LogoModule } from './logo/logo.module';
 import { PlatformModule } from './platform/platform.module';
 import { PortfolioModule } from './portfolio/portfolio.module';
+import { RebalancingModule } from './rebalancing/rebalancing.module';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { SymbolModule } from './symbol/symbol.module';
@@ -140,6 +141,7 @@ import { UserModule } from './user/user.module';
     PrismaModule,
     PropertyModule,
     PublicModule,
+    RebalancingModule,
     RedisCacheModule,
     ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({

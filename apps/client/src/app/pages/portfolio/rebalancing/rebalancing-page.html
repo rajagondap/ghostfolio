@@ -1,0 +1,238 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h2 class="d-none d-sm-block h3 mb-3 text-center" i18n>Rebalancing</h2>
+
+      @if (isReadOnly()) {
+        <div class="p-3 read-only-notice text-center text-muted" i18n>
+          The rebalancing is not available in the restricted view or while
+          impersonating another user.
+        </div>
+      } @else {
+        <div class="mb-4">
+          <h4 class="mb-3" i18n>Model</h4>
+          <div class="align-items-center d-flex flex-wrap">
+            <mat-form-field appearance="outline" class="mr-2 model-select">
+              <mat-label i18n>Rebalancing model</mat-label>
+              <mat-select
+                [value]="selectedModel()?.id ?? ''"
+                (selectionChange)="onLoadModel($event.value)"
+              >
+                <mat-option i18n value="">New (unsaved)</mat-option>
+                @for (model of models(); track model.id) {
+                  <mat-option [value]="model.id">{{ model.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            @if (canManageModels()) {
+              <button
+                class="mr-2"
+                mat-stroked-button
+                type="button"
+                [disabled]="!isValid()"
+                (click)="onSaveModel()"
+              >
+                <ng-container i18n>Save</ng-container>
+              </button>
+              @if (selectedModel()) {
+                <button
+                  class="mr-2"
+                  mat-stroked-button
+                  type="button"
+                  (click)="onRenameModel()"
+                >
+                  <ng-container i18n>Rename</ng-container>
+                </button>
+                <button
+                  color="warn"
+                  mat-stroked-button
+                  type="button"
+                  (click)="onDeleteModel()"
+                >
+                  <ng-container i18n>Delete</ng-container>
+                </button>
+              }
+            }
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <h4 class="mb-3" i18n>Target Allocation</h4>
+          <gf-allocation-editor
+            [allocations]="allocations()"
+            [currentAllocations]="currentAllocations()"
+            [level]="level()"
+            [mode]="mode()"
+            [thresholdPercent]="thresholdPercent()"
+            (allocationsChange)="onAllocationsChange($event)"
+            (levelChange)="onLevelChange($event)"
+            (modeChange)="onModeChange($event)"
+            (thresholdPercentChange)="onThresholdPercentChange($event)"
+            (validityChange)="isValid.set($event)"
+          />
+        </div>
+
+        <div class="mb-4">
+          <h4 class="mb-3" i18n>Fees</h4>
+          <div class="row">
+            <div class="col-md-4">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label i18n>Flat fee per trade</mat-label>
+                <input
+                  matInput
+                  min="0"
+                  step="0.01"
+                  type="number"
+                  [value]="flatFeePerTrade()"
+                  (input)="
+                    onFeeChange('flatFeePerTrade', $any($event.target).value)
+                  "
+                />
+                <span matTextSuffix>{{ user()?.settings?.baseCurrency }}</span>
+              </mat-form-field>
+            </div>
+            <div class="col-md-4">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label i18n>Percentage fee</mat-label>
+                <input
+                  matInput
+                  max="100"
+                  min="0"
+                  step="0.01"
+                  type="number"
+                  [value]="percentageFee()"
+                  (input)="
+                    onFeeChange('percentageFee', $any($event.target).value)
+                  "
+                />
+                <span matTextSuffix>%</span>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center mb-4">
+          <button
+            color="primary"
+            mat-flat-button
+            type="button"
+            [disabled]="!isValid() || isCalculating()"
+            (click)="onCalculate()"
+          >
+            <ng-container i18n>Calculate</ng-container>
+          </button>
+        </div>
+
+        @if (isRecalculating()) {
+          <div class="mb-3 notice p-3 text-center">
+            <span i18n
+              >Your portfolio is being recalculated. Please try again in a
+              moment.</span
+            >
+            <button
+              class="ml-2"
+              mat-stroked-button
+              type="button"
+              (click)="onCalculate()"
+            >
+              <ng-container i18n>Retry</ng-container>
+            </button>
+          </div>
+        }
+
+        @if (errorMessage(); as errorMessage) {
+          <div class="mb-3 text-center text-danger">{{ errorMessage }}</div>
+        }
+
+        @if (hasFailedImport()) {
+          <div class="mb-3 notice p-3 text-center">
+            <ng-container i18n
+              >Some activities may have been created before the
+              error.</ng-container
+            >
+            <a class="ml-1" i18n [routerLink]="activitiesRouterLink"
+              >Review your activities</a
+            >
+          </div>
+        }
+
+        @if (calculation(); as calculation) {
+          <div class="mb-5">
+            <h4 class="mb-3" i18n>Trades</h4>
+
+            @if (calculation.excludedSymbols.length > 0) {
+              <div class="mb-2 notice p-2 small">
+                <ng-container i18n
+                  >{{ calculation.excludedSymbols.length }} symbols excluded —
+                  no current price or exchange rate available</ng-container
+                >:
+                @for (
+                  excludedSymbol of calculation.excludedSymbols;
+                  track excludedSymbol.dataSource + '-' + excludedSymbol.symbol;
+                  let last = $last
+                ) {
+                  {{ excludedSymbol.symbol }}
+                  @if (excludedSymbol.reason === 'NO_EXCHANGE_RATE') {
+                    (<ng-container i18n>no exchange rate</ng-container>)
+                  }
+                  {{ last ? '' : ', ' }}
+                }
+              </div>
+            }
+
+            @for (warning of calculation.warnings; track $index) {
+              <div class="mb-2 notice p-2 small">
+                @if (warning.code === 'FEE_EXCEEDS_TRADE') {
+                  <ng-container i18n
+                    >The fee exceeds the trade of
+                    {{ warning.key }}.</ng-container
+                  >
+                } @else {
+                  <ng-container i18n
+                    >{{ warning.key }} cannot be fully rebalanced, there is no
+                    holding with a current price to trade.</ng-container
+                  >
+                }
+              </div>
+            }
+
+            @if (calculation.isWithinTolerance) {
+              <div class="p-3 text-center text-muted" i18n>
+                Your portfolio is already within tolerance of your target.
+              </div>
+            } @else if (calculation.trades.length > 0) {
+              <gf-trade-list
+                [baseCurrency]="calculation.baseCurrency"
+                [isExecuting]="isExecuting()"
+                [locale]="user()?.settings?.locale"
+                [maxActivitiesToImport]="calculation.maxActivitiesToImport"
+                [projectedLiquidityPercent]="
+                  calculation.projectedLiquidityPercent
+                "
+                [trades]="calculation.trades"
+                (downloadClicked)="onDownload($event)"
+                (executeClicked)="onExecute($event)"
+              />
+
+              @if (accounts().length > 0) {
+                <div class="account-selector mt-3">
+                  <gf-account-selector
+                    i18n-label
+                    label="Account for the new activities (optional)"
+                    [accounts]="accounts()"
+                    [formControl]="accountIdControl"
+                    [hasNullOption]="true"
+                  />
+                </div>
+              }
+            } @else {
+              <div class="p-3 text-center text-muted" i18n>
+                No executable trades for this target.
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

@@ -40,6 +40,28 @@ export class TransformDataSourceInRequestInterceptor<
       });
     }
 
+    // Target allocations of a rebalancing, saved or calculated inline
+    for (const targetAllocations of [
+      request.body?.targetAllocations,
+      request.body?.config?.targetAllocations
+    ]) {
+      if (Array.isArray(targetAllocations?.allocations)) {
+        targetAllocations.allocations = targetAllocations.allocations.map(
+          (allocation) => {
+            return allocation?.dataSource
+              ? {
+                  ...allocation,
+                  dataSource: transformDataSourceInRequest({
+                    configurationService: this.configurationService,
+                    dataSource: allocation.dataSource
+                  })
+                }
+              : allocation;
+          }
+        );
+      }
+    }
+
     if (this.configurationService.get('ENABLE_FEATURE_SUBSCRIPTION')) {
       for (const type of ['body', 'params', 'query']) {
         const dataSourceValue = request[type]?.dataSource;

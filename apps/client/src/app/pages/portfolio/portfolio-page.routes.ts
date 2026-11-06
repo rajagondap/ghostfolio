@@ -25,6 +25,11 @@ export const routes: Routes = [
           import('./allocations/allocations-page.routes').then((m) => m.routes)
       },
       {
+        path: internalRoutes.portfolio.subRoutes.rebalancing.path,
+        loadChildren: () =>
+          import('./rebalancing/rebalancing-page.routes').then((m) => m.routes)
+      },
+      {
         path: internalRoutes.portfolio.subRoutes.fire.path,
         loadChildren: () =>
           import('./fire/fire-page.routes').then((m) => m.routes)

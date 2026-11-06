@@ -7,6 +7,7 @@ import type {
 import {
   AccessType,
   Type as ActivityType,
+  AssetClass,
   AssetSubClass
 } from '@ghostfolio/prisma/enums';
 
@@ -54,13 +55,15 @@ import {
   SEARCH_QUERY_MINIMUM_LENGTH,
   TAG_ID_DRAFT,
   TAG_ID_EXCLUDE_FROM_ANALYSIS,
-  TAG_IDS_SYSTEM
+  TAG_IDS_SYSTEM,
+  UNKNOWN_KEY
 } from './config';
 import {
   AssetProfileIdentifier,
   AssetProfileItem,
   Benchmark,
   PortfolioPosition,
+  RebalancingLevel,
   UserSettings
 } from './interfaces';
 import { BenchmarkTrend, ColorScheme } from './types';
@@ -522,6 +525,52 @@ export function getNumberFormatGroup(aLocale = getLocale()) {
   return formatObject.find(({ type }) => {
     return type === 'group';
   })?.value;
+}
+
+/**
+ * Key of the bucket of a holding on the given level of a rebalancing. The cash
+ * belongs to the liquidity on the level of the asset class and to no bucket on
+ * the other levels, a fund spread across sectors counts in its largest sector.
+ */
+export function getRebalancingBucketKey({
+  assetProfile,
+  level
+}: {
+  assetProfile: Pick<
+    PortfolioPosition['assetProfile'],
+    'assetClass' | 'assetSubClass' | 'sectors' | 'symbol'
+  >;
+  level: RebalancingLevel;
+}): string | undefined {
+  const isCash = isCashPosition(assetProfile);
+
+  switch (level) {
+    case 'assetClass':
+      return isCash
+        ? AssetClass.LIQUIDITY
+        : (assetProfile.assetClass ?? UNKNOWN_KEY);
+
+    case 'sector': {
+      if (isCash) {
+        return undefined;
+      }
+
+      const [primarySector] = [...(assetProfile.sectors ?? [])].sort((a, b) => {
+        return b.weight - a.weight;
+      });
+
+      return primarySector?.name ?? UNKNOWN_KEY;
+    }
+
+    case 'symbol':
+      return isCash ? undefined : assetProfile.symbol;
+
+    default: {
+      const exhaustiveCheck: never = level;
+
+      return exhaustiveCheck;
+    }
+  }
 }
 
 export function getStartOfUtcDate(aDate: Date) {

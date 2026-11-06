@@ -7,6 +7,12 @@ import type { AdminJobs } from './admin-jobs.interface';
 import type { AdminMarketDataDetails } from './admin-market-data-details.interface';
 import type { AdminUser } from './admin-user.interface';
 import type { AiActivityRow } from './ai-activity-row.interface';
+import type {
+  AllocationTarget,
+  RebalancingFeeConfig,
+  RebalancingLevel,
+  RebalancingTargetAllocations
+} from './allocation-target.interface';
 import type { AssetClassSelectorOption } from './asset-class-selector-option.interface';
 import type { AssetProfileIdentifier } from './asset-profile-identifier.interface';
 import type { AssetProfileItem } from './asset-profile-item.interface';
@@ -37,6 +43,7 @@ import type { PortfolioPosition } from './portfolio-position.interface';
 import type { PortfolioReportRule } from './portfolio-report-rule.interface';
 import type { PortfolioSummary } from './portfolio-summary.interface';
 import type { Product } from './product.interface';
+import type { RebalancingModel } from './rebalancing-model.interface';
 import type { ReferralPartner } from './referral-partner.interface';
 import type { AccessTokenResponse } from './responses/access-token-response.interface';
 import type { AccountBalancesResponse } from './responses/account-balances-response.interface';
@@ -84,6 +91,8 @@ import type { PortfolioPerformanceResponse } from './responses/portfolio-perform
 import type { PortfolioReportResponse } from './responses/portfolio-report.interface';
 import type { PublicPortfolioResponse } from './responses/public-portfolio-response.interface';
 import type { QuotesResponse } from './responses/quotes-response.interface';
+import type { RebalancingCalculationResponse } from './responses/rebalancing-calculation-response.interface';
+import type { RebalancingModelsResponse } from './responses/rebalancing-models-response.interface';
 import type { WatchlistResponse } from './responses/watchlist-response.interface';
 import type { RuleSettings } from './rule-settings.interface';
 import type { ScraperConfiguration } from './scraper-configuration.interface';
@@ -97,6 +106,7 @@ import type { Statistics } from './statistics.interface';
 import type { SubscriptionOffer } from './subscription-offer.interface';
 import type { SymbolItem } from './symbol-item.interface';
 import type { SystemMessage } from './system-message.interface';
+import type { TradeRecommendation } from './trade-recommendation.interface';
 import type { UserItem } from './user-item.interface';
 import type { UserSettings } from './user-settings.interface';
 import type { User } from './user.interface';
@@ -124,6 +134,7 @@ export {
   AiActivityRow,
   AiPromptResponse,
   AiServiceHealthResponse,
+  AllocationTarget,
   ApiKeyResponse,
   AssertionCredentialJSON,
   AssetClassSelectorOption,
@@ -188,6 +199,12 @@ export {
   PublicKeyCredentialRequestOptionsJSON,
   PublicPortfolioResponse,
   QuotesResponse,
+  RebalancingCalculationResponse,
+  RebalancingFeeConfig,
+  RebalancingLevel,
+  RebalancingModel,
+  RebalancingModelsResponse,
+  RebalancingTargetAllocations,
   ReferralPartner,
   ResponseError,
   RuleSettings,
@@ -196,6 +213,7 @@ export {
   SubscriptionOffer,
   SymbolItem,
   SystemMessage,
+  TradeRecommendation,
   User,
   UserItem,
   UserSettings,

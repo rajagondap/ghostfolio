@@ -219,6 +219,21 @@ export const internalRoutes = {
         routerLink: ['/portfolio', 'fire'],
         title: 'FIRE'
       },
+      rebalancing: {
+        // Offered in the assistant only if the values are shown, as the
+        // rebalancing consists of absolute values
+        excludeFromAssistant: (aUser: User) => {
+          return (
+            hasPermission(
+              aUser?.permissions,
+              permissions.readRebalancingModels
+            ) && !aUser?.settings?.isRestrictedView
+          );
+        },
+        path: 'rebalancing',
+        routerLink: ['/portfolio', 'rebalancing'],
+        title: $localize`Rebalancing`
+      },
       xRay: {
         path: 'x-ray',
         routerLink: ['/portfolio', 'x-ray'],

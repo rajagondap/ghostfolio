@@ -25,6 +25,7 @@ describe('Scopes', () => {
         scopes.activityRead,
         scopes.portfolioRead,
         scopes.portfolioReadValues,
+        scopes.rebalancingRead,
         scopes.watchlistRead
       ]);
     });
@@ -41,6 +42,9 @@ describe('Scopes', () => {
         scopes.activityCreate,
         scopes.activityDelete,
         scopes.activityUpdate,
+        scopes.rebalancingCreate,
+        scopes.rebalancingDelete,
+        scopes.rebalancingUpdate,
         scopes.watchlistCreate,
         scopes.watchlistDelete
       ]);
@@ -186,6 +190,18 @@ describe('Scopes', () => {
       expect(scopesOfAccess).not.toContain(scopes.watchlistRead);
     });
 
+    it('Excludes the rebalancing models', () => {
+      const scopesOfAccess = getScopesOfAccess({
+        scopes: [...SCOPES_OF_READ_ACCESS, ...SCOPES_OF_WRITE_ACCESS],
+        type: 'PUBLIC'
+      });
+
+      expect(scopesOfAccess).not.toContain(scopes.rebalancingCreate);
+      expect(scopesOfAccess).not.toContain(scopes.rebalancingDelete);
+      expect(scopesOfAccess).not.toContain(scopes.rebalancingRead);
+      expect(scopesOfAccess).not.toContain(scopes.rebalancingUpdate);
+    });
+
     it('Cannot be widened by the scopes', () => {
       expect(
         getScopesOfAccess({
@@ -328,6 +344,10 @@ describe('Scopes', () => {
         scopes.activityUpdate,
         scopes.portfolioRead,
         scopes.portfolioReadValues,
+        scopes.rebalancingCreate,
+        scopes.rebalancingDelete,
+        scopes.rebalancingRead,
+        scopes.rebalancingUpdate,
         scopes.watchlistCreate,
         scopes.watchlistDelete,
         scopes.watchlistRead
@@ -343,6 +363,7 @@ describe('Scopes', () => {
         scopes.accountRead,
         scopes.activityRead,
         scopes.portfolioRead,
+        scopes.rebalancingRead,
         scopes.watchlistRead
       ]);
     });

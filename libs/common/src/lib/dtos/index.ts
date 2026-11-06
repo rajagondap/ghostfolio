@@ -1,4 +1,5 @@
 import { AuthDeviceDto } from './auth-device.dto';
+import { CalculateRebalancingDto } from './calculate-rebalancing.dto';
 import { CountryDto } from './country.dto';
 import { CreateAccessDto } from './create-access.dto';
 import { CreateAccountBalanceDto } from './create-account-balance.dto';
@@ -9,6 +10,10 @@ import { CreateAssetProfileWithMarketDataDto } from './create-asset-profile-with
 import { CreateAssetProfileDto } from './create-asset-profile.dto';
 import { CreateOrderDto } from './create-order.dto';
 import { CreatePlatformDto } from './create-platform.dto';
+import {
+  CreateRebalancingModelDto,
+  RebalancingConfigDto
+} from './create-rebalancing-model.dto';
 import { CreateTagDto } from './create-tag.dto';
 import { CreateUserDto } from './create-user.dto';
 import { CreateWatchlistItemDto } from './create-watchlist-item.dto';
@@ -28,11 +33,13 @@ import { UpdateOrderDto } from './update-order.dto';
 import { UpdateOwnAccessTokenDto } from './update-own-access-token.dto';
 import { UpdatePlatformDto } from './update-platform.dto';
 import { UpdatePropertyDto } from './update-property.dto';
+import { UpdateRebalancingModelDto } from './update-rebalancing-model.dto';
 import { UpdateTagDto } from './update-tag.dto';
 import { UpdateUserSettingDto } from './update-user-setting.dto';
 
 export {
   AuthDeviceDto,
+  CalculateRebalancingDto,
   CountryDto,
   CreateAccessDto,
   CreateAccountBalanceDto,
@@ -43,12 +50,14 @@ export {
   CreateAssetProfileWithMarketDataDto,
   CreateOrderDto,
   CreatePlatformDto,
+  CreateRebalancingModelDto,
   CreateTagDto,
   CreateUserDto,
   CreateWatchlistItemDto,
   DeleteOwnUserDto,
   HoldingDto,
   MergeAssetProfileDto,
+  RebalancingConfigDto,
   ScraperConfigurationDto,
   SectorDto,
   TransferBalanceDto,
@@ -62,6 +71,7 @@ export {
   UpdateOwnAccessTokenDto,
   UpdatePlatformDto,
   UpdatePropertyDto,
+  UpdateRebalancingModelDto,
   UpdateTagDto,
   UpdateUserSettingDto
 };

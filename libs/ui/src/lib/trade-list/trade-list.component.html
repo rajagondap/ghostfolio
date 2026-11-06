@@ -1,0 +1,244 @@
+<div class="overflow-x-auto">
+  <table
+    class="gf-table w-100"
+    mat-table
+    matSort
+    matSortActive="driftPercent"
+    matSortDirection="desc"
+    [dataSource]="dataSource"
+  >
+    <ng-container matColumnDef="select">
+      <th *matHeaderCellDef class="px-1" mat-header-cell></th>
+      <td *matCellDef="let element" class="px-1" mat-cell>
+        <mat-checkbox
+          color="primary"
+          [checked]="isSelected(element)"
+          [disabled]="isExecuting()"
+          (change)="onToggle(element)"
+        />
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="symbol">
+      <th *matHeaderCellDef class="px-1" i18n mat-header-cell mat-sort-header>
+        Name
+      </th>
+      <td *matCellDef="let element" class="px-1" mat-cell>
+        <div class="text-truncate">{{ element.name }}</div>
+        <div class="small text-muted">
+          {{ element.symbol }} · {{ element.bucketKey }}
+        </div>
+        @if (element.hasInsufficientCash) {
+          <div class="small text-muted" i18n>Insufficient cash</div>
+        }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="action">
+      <th *matHeaderCellDef class="px-1" i18n mat-header-cell mat-sort-header>
+        Action
+      </th>
+      <td *matCellDef="let element" class="px-1" mat-cell>
+        <span
+          class="action-badge"
+          [class.buy]="element.action === 'BUY'"
+          [class.sell]="element.action === 'SELL'"
+        >
+          @if (element.action === 'BUY') {
+            <ng-container i18n>Buy</ng-container>
+          } @else {
+            <ng-container i18n>Sell</ng-container>
+          }
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="quantity">
+      <th
+        *matHeaderCellDef
+        class="justify-content-end px-1"
+        i18n
+        mat-header-cell
+        mat-sort-header
+      >
+        Quantity
+      </th>
+      <td *matCellDef="let element" class="px-1" mat-cell>
+        <div class="d-flex justify-content-end">
+          <gf-value
+            [locale]="locale()"
+            [precision]="4"
+            [value]="element.quantity"
+          />
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="currentAllocationPercent">
+      <th
+        *matHeaderCellDef
+        class="justify-content-end px-1"
+        i18n
+        mat-header-cell
+        mat-sort-header
+      >
+        Current
+      </th>
+      <td *matCellDef="let element" class="px-1" mat-cell>
+        <div class="d-flex justify-content-end">
+          <gf-value
+            [isPercent]="true"
+            [locale]="locale()"
+            [value]="element.currentAllocationPercent / 100"
+          />
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="targetAllocationPercent">
+      <th
+        *matHeaderCellDef
+        class="justify-content-end px-1"
+        i18n
+        mat-header-cell
+        mat-sort-header
+      >
+        Target
+      </th>
+      <td *matCellDef="let element" class="px-1" mat-cell>
+        <div class="d-flex justify-content-end">
+          <gf-value
+            [isPercent]="true"
+            [locale]="locale()"
+            [value]="element.targetAllocationPercent / 100"
+          />
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="driftPercent">
+      <th
+        *matHeaderCellDef
+        class="justify-content-end px-1"
+        i18n
+        mat-header-cell
+        mat-sort-header
+      >
+        Drift
+      </th>
+      <td *matCellDef="let element" class="px-1" mat-cell>
+        <div class="d-flex justify-content-end">
+          <gf-value
+            [colorizeSign]="true"
+            [isPercent]="true"
+            [locale]="locale()"
+            [value]="element.driftPercent / 100"
+          />
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="estimatedValue">
+      <th
+        *matHeaderCellDef
+        class="justify-content-end px-1"
+        i18n
+        mat-header-cell
+        mat-sort-header
+      >
+        Value
+      </th>
+      <td *matCellDef="let element" class="px-1" mat-cell>
+        <div class="d-flex justify-content-end">
+          <gf-value
+            [isCurrency]="true"
+            [locale]="locale()"
+            [unit]="baseCurrency()"
+            [value]="element.estimatedValue"
+          />
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="estimatedFee">
+      <th
+        *matHeaderCellDef
+        class="justify-content-end px-1"
+        i18n
+        mat-header-cell
+        mat-sort-header
+      >
+        Fee
+      </th>
+      <td *matCellDef="let element" class="px-1" mat-cell>
+        <div class="d-flex justify-content-end">
+          <gf-value
+            [isCurrency]="true"
+            [locale]="locale()"
+            [unit]="baseCurrency()"
+            [value]="element.estimatedFee"
+          />
+        </div>
+      </td>
+    </ng-container>
+
+    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr
+      *matRowDef="let row; columns: displayedColumns"
+      mat-row
+      [class.insufficient-cash]="row.hasInsufficientCash"
+    ></tr>
+  </table>
+</div>
+
+<div class="align-items-center d-flex flex-wrap justify-content-between mt-3">
+  <div class="small">
+    <div>
+      <ng-container i18n>Total estimated fees</ng-container>:
+      <gf-value
+        class="d-inline-block"
+        [isCurrency]="true"
+        [locale]="locale()"
+        [unit]="baseCurrency()"
+        [value]="totalEstimatedFees()"
+      />
+    </div>
+    @if (projectedLiquidityPercent() !== null) {
+      <div>
+        <ng-container i18n>Projected liquidity</ng-container>:
+        <gf-value
+          class="d-inline-block"
+          [isPercent]="true"
+          [locale]="locale()"
+          [value]="(projectedLiquidityPercent() ?? 0) / 100"
+        />
+      </div>
+    }
+    @if (isOverLimit()) {
+      <div class="text-danger" i18n>
+        Select at most {{ maxActivitiesToImport() }} trades (import limit of
+        your plan)
+      </div>
+    }
+  </div>
+  <div class="d-flex mt-2 mt-md-0">
+    <button
+      class="mr-2"
+      mat-stroked-button
+      type="button"
+      [disabled]="!canSubmit()"
+      (click)="onDownload()"
+    >
+      <ng-container i18n>Download JSON</ng-container>
+    </button>
+    <button
+      color="primary"
+      mat-flat-button
+      type="button"
+      [disabled]="!canSubmit()"
+      (click)="onExecute()"
+    >
+      <ng-container i18n>Execute Rebalancing</ng-container>
+    </button>
+  </div>
+</div>
