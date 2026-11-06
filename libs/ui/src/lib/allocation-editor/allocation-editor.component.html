@@ -1,0 +1,220 @@
+<div class="row">
+  <div class="col-md-4">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label i18n>Level</mat-label>
+      <mat-select
+        [disabled]="isDisabled()"
+        [value]="level()"
+        (selectionChange)="onChangeLevel($event.value)"
+      >
+        @for (levelOption of levels; track levelOption.value) {
+          <mat-option [value]="levelOption.value">{{
+            levelOption.label
+          }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="col-md-4">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label i18n>Mode</mat-label>
+      <mat-select
+        [disabled]="isDisabled()"
+        [value]="mode()"
+        (selectionChange)="onChangeMode($event.value)"
+      >
+        @for (modeOption of modes; track modeOption.value) {
+          <mat-option [value]="modeOption.value">{{
+            modeOption.label
+          }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+  @if (mode() === 'THRESHOLD') {
+    <div class="col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label i18n>Threshold</mat-label>
+        <input
+          matInput
+          max="100"
+          min="0"
+          step="0.5"
+          type="number"
+          [disabled]="isDisabled()"
+          [value]="thresholdPercent() ?? ''"
+          (input)="onChangeThresholdPercent($any($event.target).value)"
+        />
+        <span matTextSuffix>%</span>
+      </mat-form-field>
+    </div>
+  }
+</div>
+
+@if (level() === 'sector') {
+  <p class="small text-muted" i18n>
+    Multi-sector funds are counted in their largest sector.
+  </p>
+}
+
+@if (allocations().length === 0) {
+  <div class="empty-state p-3 text-center text-muted">
+    <ng-container i18n
+      >Add an allocation to define your target portfolio.</ng-container
+    >
+  </div>
+} @else {
+  <div class="allocation-rows">
+    <div class="allocation-row d-none d-md-flex font-weight-bold small">
+      <div class="key" i18n>Name</div>
+      <div class="percent" i18n>Current</div>
+      <div class="percent" i18n>Target</div>
+      <div class="percent" i18n>Min</div>
+      <div class="percent" i18n>Max</div>
+      <div class="actions"></div>
+    </div>
+    @for (allocation of allocations(); track allocation.key; let i = $index) {
+      <div class="allocation-row align-items-center d-flex flex-wrap">
+        <div class="key">
+          {{ getLabel(allocation.key) }}
+          @if (allocation.key === residualKey()) {
+            <div class="small text-muted" i18n>Residual, filled by cash</div>
+          }
+          @if (allocation.dataSource) {
+            <div class="small text-muted">{{ allocation.dataSource }}</div>
+          }
+        </div>
+        <div class="percent text-muted">
+          @if (getCurrentPercent(allocation.key) !== undefined) {
+            {{ getCurrentPercent(allocation.key)?.toFixed(2) }}%
+          } @else {
+            0%
+          }
+        </div>
+        <div class="percent">
+          <input
+            aria-label="Target"
+            class="form-control form-control-sm"
+            i18n-aria-label
+            max="100"
+            min="0"
+            step="0.5"
+            type="number"
+            [disabled]="isDisabled()"
+            [value]="allocation.targetPercent"
+            (input)="
+              onChangeAllocation(i, 'targetPercent', $any($event.target).value)
+            "
+          />
+        </div>
+        <div class="percent">
+          <input
+            aria-label="Min"
+            class="form-control form-control-sm"
+            i18n-aria-label
+            max="100"
+            min="0"
+            step="0.5"
+            type="number"
+            [disabled]="isDisabled()"
+            [value]="allocation.minPercent ?? ''"
+            (input)="
+              onChangeAllocation(i, 'minPercent', $any($event.target).value)
+            "
+          />
+        </div>
+        <div class="percent">
+          <input
+            aria-label="Max"
+            class="form-control form-control-sm"
+            i18n-aria-label
+            max="100"
+            min="0"
+            step="0.5"
+            type="number"
+            [disabled]="isDisabled()"
+            [value]="allocation.maxPercent ?? ''"
+            (input)="
+              onChangeAllocation(i, 'maxPercent', $any($event.target).value)
+            "
+          />
+        </div>
+        <div class="actions text-right">
+          <button
+            aria-label="Remove"
+            i18n-aria-label
+            mat-icon-button
+            type="button"
+            [disabled]="isDisabled()"
+            (click)="onRemoveAllocation(i)"
+          >
+            <ion-icon name="trash-outline" />
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@for (
+  unlistedAllocation of unlistedAllocations();
+  track unlistedAllocation.key
+) {
+  <div class="allocation-row d-flex text-muted unlisted">
+    <div class="key">{{ getLabel(unlistedAllocation.key) }}</div>
+    <div class="percent">{{ unlistedAllocation.percent.toFixed(2) }}%</div>
+    <div class="flex-grow-1 small" i18n>Not in target, will be sold</div>
+  </div>
+}
+
+@if (!isDisabled()) {
+  <div class="align-items-center d-flex flex-wrap mt-3">
+    @switch (level()) {
+      @case ('assetClass') {
+        <mat-form-field appearance="outline" class="mr-2">
+          <mat-label i18n>Add asset class</mat-label>
+          <mat-select (selectionChange)="onAddAssetClass($event.value)">
+            @for (option of assetClassOptions(); track option.key) {
+              <mat-option [value]="option.key">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+      @case ('sector') {
+        <mat-form-field appearance="outline" class="mr-2">
+          <mat-label i18n>Add sector</mat-label>
+          <input
+            matInput
+            type="text"
+            [formControl]="newSectorControl"
+            (keydown.enter)="onAddSector()"
+          />
+        </mat-form-field>
+        <button mat-stroked-button type="button" (click)="onAddSector()">
+          <ion-icon class="mr-1" name="add-outline" />
+          <ng-container i18n>Add</ng-container>
+        </button>
+      }
+      @case ('symbol') {
+        <mat-form-field appearance="outline" class="mr-2 symbol-field">
+          <mat-label i18n>Add symbol</mat-label>
+          <gf-symbol-autocomplete [formControl]="newSymbolControl" />
+        </mat-form-field>
+        <button mat-stroked-button type="button" (click)="onAddSymbol()">
+          <ion-icon class="mr-1" name="add-outline" />
+          <ng-container i18n>Add</ng-container>
+        </button>
+      }
+    }
+  </div>
+}
+
+<div class="d-flex justify-content-end mt-2">
+  @if (error(); as error) {
+    <span class="text-danger">{{ error }}</span>
+  } @else if (allocations().length > 0) {
+    <span class="text-success"
+      ><ng-container i18n>Total</ng-container>: {{ total().toFixed(2) }}%</span
+    >
+  }
+</div>

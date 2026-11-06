@@ -1,0 +1,24 @@
+:host {
+  display: block;
+
+  .account-selector {
+    max-width: 24rem;
+  }
+
+  .model-select {
+    min-width: 16rem;
+  }
+
+  .notice,
+  .read-only-notice {
+    border: 1px solid rgba(var(--dark-dividers));
+    border-radius: 0.25rem;
+  }
+}
+
+:host-context(.theme-dark) {
+  .notice,
+  .read-only-notice {
+    border-color: rgba(var(--light-dividers));
+  }
+}

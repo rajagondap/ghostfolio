@@ -18,6 +18,10 @@ export const scopes = {
   activityUpdate: 'activity:update',
   portfolioRead: 'portfolio:read',
   portfolioReadValues: 'portfolio:read:values',
+  rebalancingCreate: 'rebalancing:create',
+  rebalancingDelete: 'rebalancing:delete',
+  rebalancingRead: 'rebalancing:read',
+  rebalancingUpdate: 'rebalancing:update',
   watchlistCreate: 'watchlist:create',
   watchlistDelete: 'watchlist:delete',
   watchlistRead: 'watchlist:read'
@@ -33,6 +37,7 @@ export const SCOPES_OF_READ_ACCESS: readonly Scope[] = [
   scopes.activityRead,
   scopes.portfolioRead,
   scopes.portfolioReadValues,
+  scopes.rebalancingRead,
   scopes.watchlistRead
 ];
 
@@ -46,6 +51,9 @@ export const SCOPES_OF_WRITE_ACCESS: readonly Scope[] = [
   scopes.activityCreate,
   scopes.activityDelete,
   scopes.activityUpdate,
+  scopes.rebalancingCreate,
+  scopes.rebalancingDelete,
+  scopes.rebalancingUpdate,
   scopes.watchlistCreate,
   scopes.watchlistDelete
 ];

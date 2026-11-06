@@ -1,8 +1,10 @@
 import {
+  CalculateRebalancingDto,
   CreateAccessDto,
   CreateAccountBalanceDto,
   CreateAccountDto,
   CreateOrderDto,
+  CreateRebalancingModelDto,
   CreateTagDto,
   CreateUserDto,
   CreateWatchlistItemDto,
@@ -14,6 +16,7 @@ import {
   UpdateOrderDto,
   UpdateOwnAccessTokenDto,
   UpdatePropertyDto,
+  UpdateRebalancingModelDto,
   UpdateTagDto,
   UpdateUserSettingDto
 } from '@ghostfolio/common/dtos';
@@ -55,6 +58,9 @@ import {
   PortfolioPerformanceResponse,
   PortfolioReportResponse,
   PublicPortfolioResponse,
+  RebalancingCalculationResponse,
+  RebalancingModel,
+  RebalancingModelsResponse,
   SymbolItem,
   User,
   UserItem,
@@ -364,6 +370,10 @@ export class DataService {
 
   public deleteOwnUser(aData: DeleteOwnUserDto) {
     return this.http.delete<UserModel>(`/api/v1/user`, { body: aData });
+  }
+
+  public deleteRebalancingModel(aId: string) {
+    return this.http.delete<void>(`/api/v1/rebalancing/${aId}`);
   }
 
   public deleteTag(aId: string) {
@@ -807,6 +817,14 @@ export class DataService {
       );
   }
 
+  public fetchRebalancingModel(aId: string) {
+    return this.http.get<RebalancingModel>(`/api/v1/rebalancing/${aId}`);
+  }
+
+  public fetchRebalancingModels() {
+    return this.http.get<RebalancingModelsResponse>('/api/v1/rebalancing');
+  }
+
   public fetchSymbolItem({
     dataSource,
     includeHistoricalData,
@@ -914,6 +932,24 @@ export class DataService {
     return this.http.post<MarketData>(url, marketData);
   }
 
+  public postRebalancingCalculation(
+    aCalculateRebalancingDto: CalculateRebalancingDto
+  ) {
+    return this.http.post<RebalancingCalculationResponse>(
+      '/api/v1/rebalancing/calculate',
+      aCalculateRebalancingDto
+    );
+  }
+
+  public postRebalancingModel(
+    aCreateRebalancingModelDto: CreateRebalancingModelDto
+  ) {
+    return this.http.post<RebalancingModel>(
+      '/api/v1/rebalancing',
+      aCreateRebalancingModelDto
+    );
+  }
+
   public postTag(aTag: CreateTagDto) {
     return this.http.post<Tag>(`/api/v1/tags`, aTag);
   }
@@ -950,6 +986,16 @@ export class DataService {
     return this.http.put<void>(
       `/api/v1/portfolio/holding/${dataSource}/${encodeURIComponent(symbol)}/tags`,
       { tags }
+    );
+  }
+
+  public putRebalancingModel(
+    aId: string,
+    aUpdateRebalancingModelDto: UpdateRebalancingModelDto
+  ) {
+    return this.http.put<RebalancingModel>(
+      `/api/v1/rebalancing/${aId}`,
+      aUpdateRebalancingModelDto
     );
   }
 

@@ -1,6 +1,7 @@
 import {
   TAG_ID_EMERGENCY_FUND,
-  TAG_ID_EXCLUDE_FROM_ANALYSIS
+  TAG_ID_EXCLUDE_FROM_ANALYSIS,
+  UNKNOWN_KEY
 } from '@ghostfolio/common/config';
 import {
   canApplyFiltersToAccess,
@@ -10,6 +11,7 @@ import {
   getEmojiFlag,
   getHoldingName,
   getNumberFormatGroup,
+  getRebalancingBucketKey,
   getStringOrNull,
   getStringOrUndefined,
   isAccountExcluded,
@@ -23,7 +25,8 @@ import {
   isValidGranteeOfAccess,
   resolveUserSettings
 } from '@ghostfolio/common/helper';
-import { UserSettings } from '@ghostfolio/common/interfaces';
+import { PortfolioPosition, UserSettings } from '@ghostfolio/common/interfaces';
+import { AssetClass, AssetSubClass } from '@ghostfolio/prisma/enums';
 
 describe('Helper', () => {
   describe('Can apply filters to access', () => {
@@ -303,6 +306,122 @@ describe('Helper', () => {
     it('Get zh-CN number format group when it is default', () => {
       languageGetter.mockReturnValue('zh-CN');
       expect(getNumberFormatGroup()).toEqual(',');
+    });
+  });
+
+  describe('Get rebalancing bucket key', () => {
+    const getAssetProfile = (
+      aAssetProfile: Partial<PortfolioPosition['assetProfile']>
+    ) => {
+      return {
+        sectors: [],
+        symbol: 'SYMBOL',
+        ...aAssetProfile
+      } as PortfolioPosition['assetProfile'];
+    };
+
+    const cash = getAssetProfile({
+      assetClass: AssetClass.LIQUIDITY,
+      assetSubClass: AssetSubClass.CASH,
+      symbol: 'USD'
+    });
+
+    it('Asset class of a holding', () => {
+      expect(
+        getRebalancingBucketKey({
+          assetProfile: getAssetProfile({
+            assetClass: AssetClass.EQUITY,
+            assetSubClass: AssetSubClass.STOCK
+          }),
+          level: 'assetClass'
+        })
+      ).toEqual(AssetClass.EQUITY);
+    });
+
+    it('Asset class of the cash and of a money market fund', () => {
+      expect(
+        getRebalancingBucketKey({ assetProfile: cash, level: 'assetClass' })
+      ).toEqual(AssetClass.LIQUIDITY);
+
+      // A cash position is liquidity regardless of its asset class
+      expect(
+        getRebalancingBucketKey({
+          assetProfile: { ...cash, assetClass: undefined },
+          level: 'assetClass'
+        })
+      ).toEqual(AssetClass.LIQUIDITY);
+
+      expect(
+        getRebalancingBucketKey({
+          assetProfile: getAssetProfile({
+            assetClass: AssetClass.LIQUIDITY,
+            assetSubClass: AssetSubClass.MUTUALFUND
+          }),
+          level: 'assetClass'
+        })
+      ).toEqual(AssetClass.LIQUIDITY);
+    });
+
+    it('Asset class of a holding without an asset class', () => {
+      expect(
+        getRebalancingBucketKey({
+          assetProfile: getAssetProfile({}),
+          level: 'assetClass'
+        })
+      ).toEqual(UNKNOWN_KEY);
+    });
+
+    it('Largest sector of a holding', () => {
+      const sectors = [
+        { name: 'Financial Services', weight: 0.2 },
+        { name: 'Technology', weight: 0.3 },
+        { name: 'Health Care', weight: 0.1 }
+      ];
+
+      expect(
+        getRebalancingBucketKey({
+          assetProfile: getAssetProfile({
+            sectors,
+            assetClass: AssetClass.EQUITY
+          }),
+          level: 'sector'
+        })
+      ).toEqual('Technology');
+
+      // The sectors of the asset profile are not reordered
+      expect(sectors[0].name).toEqual('Financial Services');
+    });
+
+    it('Sector of a holding without sectors', () => {
+      for (const sectors of [[], undefined]) {
+        expect(
+          getRebalancingBucketKey({
+            assetProfile: getAssetProfile({ sectors }),
+            level: 'sector'
+          })
+        ).toEqual(UNKNOWN_KEY);
+      }
+    });
+
+    it('Symbol of a holding', () => {
+      expect(
+        getRebalancingBucketKey({
+          assetProfile: getAssetProfile({
+            assetClass: AssetClass.EQUITY,
+            symbol: 'VTI'
+          }),
+          level: 'symbol'
+        })
+      ).toEqual('VTI');
+    });
+
+    it('No bucket for the cash on the level of the sector and the symbol', () => {
+      expect(
+        getRebalancingBucketKey({ assetProfile: cash, level: 'sector' })
+      ).toBeUndefined();
+      expect(
+        getRebalancingBucketKey({ assetProfile: cash, level: 'symbol' })
+      ).toBeUndefined();
     });
   });
 

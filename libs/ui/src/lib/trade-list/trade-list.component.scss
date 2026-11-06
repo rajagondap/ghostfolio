@@ -1,0 +1,17 @@
+:host {
+  .action-badge {
+    font-weight: 500;
+
+    &.buy {
+      color: var(--green);
+    }
+
+    &.sell {
+      color: var(--red);
+    }
+  }
+
+  .insufficient-cash {
+    opacity: 0.5;
+  }
+}
